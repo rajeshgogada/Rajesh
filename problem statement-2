@@ -47,15 +47,10 @@ check_disk
 check_processes
 
 
-#!/bin/bash
-
-# Define the application URL
 URL="http://your-application-url.com"
 
-# Send HTTP request and capture the status code
 HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" "$URL")
 
-# Check if the application is up
 if [ "$HTTP_STATUS" -eq 200 ]; then
   echo "Application is UP. Status code: $HTTP_STATUS"
 else
