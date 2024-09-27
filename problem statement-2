@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Define thresholds
+CPU_THRESHOLD=80
+MEMORY_THRESHOLD=80
+DISK_THRESHOLD=90
+
+# Function to check CPU usage
+check_cpu() {
+  CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')
+  CPU_INT=${CPU_USAGE%.*}
+
+  if [ "$CPU_INT" -gt "$CPU_THRESHOLD" ]; then
+    echo "ALERT: CPU usage is above $CPU_THRESHOLD%. Current usage: $CPU_USAGE%"
+  fi
+}
+
+# Function to check memory usage
+check_memory() {
+  MEMORY_USAGE=$(free | grep Mem | awk '{print $3/$2 * 100.0}')
+  MEMORY_INT=${MEMORY_USAGE%.*}
+
+  if [ "$MEMORY_INT" -gt "$MEMORY_THRESHOLD" ]; then
+    echo "ALERT: Memory usage is above $MEMORY_THRESHOLD%. Current usage: $MEMORY_USAGE%"
+  fi
+}
+
+# Function to check disk space
+check_disk() {
+  DISK_USAGE=$(df -h / | grep '/' | awk '{print $5}' | sed 's/%//')
+  
+  if [ "$DISK_USAGE" -gt "$DISK_THRESHOLD" ]; then
+    echo "ALERT: Disk usage is above $DISK_THRESHOLD%. Current usage: $DISK_USAGE%"
+  fi
+}
+
+# Function to check number of running processes
+check_processes() {
+  PROCESS_COUNT=$(ps aux | wc -l)
+  echo "INFO: Number of running processes: $PROCESS_COUNT"
+}
+
+# Run checks
+check_cpu
+check_memory
+check_disk
+check_processes
+
+
+#!/bin/bash
+
+# Define the application URL
+URL="http://your-application-url.com"
+
+# Send HTTP request and capture the status code
+HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" "$URL")
+
+# Check if the application is up
+if [ "$HTTP_STATUS" -eq 200 ]; then
+  echo "Application is UP. Status code: $HTTP_STATUS"
+else
+  echo "Application is DOWN or unavailable. Status code: $HTTP_STATUS"
+fi
